@@ -6,12 +6,17 @@ function init() {
 
 	const renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setClearColor(0xffffff);
 	document.body.appendChild( renderer.domElement );
 
-	var cube = getCube(1,1,1);
-	cube.position.y = cube.geometry.parameters.height / 2;
+	scene.fog = new THREE.FogExp2(0xffffff, 0.2);
 
-	var plane = getPlane(4);
+	var cube = getCube(1,1,1);
+	var plane = getPlane(20);
+
+	plane.name = "plane-1";
+	cube.name = "cube-1";
+	cube.position.y = cube.geometry.parameters.height / 2;
 	plane.rotation.x = Math.PI/2;
 
 	scene.add( cube );
@@ -23,12 +28,19 @@ function init() {
 
 	camera.lookAt(new THREE.Vector3(0, 0, 0));
 	
-	renderer.render(scene, camera);
-	// function animate() {
-	// 	requestAnimationFrame( animate );
-	// 	renderer.render( scene, camera );
-	// }
-	// animate();
+	update(renderer, scene, camera);
+	
+	return scene;
+}
+function update(renderer, scene, camera) {
+	requestAnimationFrame( () => update(renderer, scene, camera) );
+
+	// var plane = scene.getObjectByName("plane-1");
+	var cube = scene.getObjectByName("cube-1");
+	cube.rotation.x += 0.001;
+	cube.scale.x += 0.001;
+	cube.position.y += 0.001;
+	renderer.render( scene, camera );
 }
 
 function getCube(w, h, d) {
@@ -44,4 +56,5 @@ function getPlane(size) {
 	return mesh
 }
 
-init();
+var scene = init(); // Can't access for some reason
+window.scene = scene; // Can access with window.scene in the browser's console
