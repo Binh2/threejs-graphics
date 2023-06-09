@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as TWEEN from '@tweenjs/tween.js';
 import Noise from 'noisejs';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { MeshPhongMaterial } from 'three';
 import { Mesh } from 'three';
 
@@ -31,36 +31,42 @@ function init() {
 	sphere.position.x = -7.5;
 	cone.position.x = -5;
 	cylinder.position.x = -2.5;
-	donut.position.x = 0.5;
+	donut.position.x = 4.5;
 	scene.add(box)
 	scene.add(sphere)
 	scene.add(cone)
 	scene.add(cylinder)
 	scene.add(donut)
 
-	new MTLLoader().load("assets/objects/Ginger_Bread_Cookies_OBJ.mtl", material => {
-		material.preload()
-		console.log(material)
-	
-		new FBXLoader().load("assets/objects/Ginger_Bread_Cookies_FBX.fbx", group => {
-			group.traverse(child => {
-				if (child instanceof Mesh) {
-					console.log(child)
-					child.material = material.materials.lambert1
-				}
-			})
-			group.position.x = 5.0;
-			group.position.y = -1
-			const scale = 0.2;
-			group.scale.x = scale;
-			group.scale.y = scale;
-			group.scale.z = scale;
-			group.castShadow = true;
-			scene.add(group)
+	new FBXLoader().load("assets/objects/original-wheel.fbx", group => {
+		const scale = 2;
+		group.scale.x = scale;
+		group.scale.y = scale;
+		group.scale.z = scale;
+		group.position.x = -0.5
+		scene.add(group);
+	})
+	new FBXLoader().load("assets/objects/teapot_s0.fbx", group => {
+		const scale = 0.1;
+		group.scale.x = scale;
+		group.scale.y = scale;
+		group.scale.z = scale;
+		group.position.x = 1
+		group.position.y = -0.5
+		scene.add(group);
+	})
 
-			
-		})
-	});
+	new FBXLoader().load("assets/objects/Ginger_Bread_Cookies_FBX.fbx", group => {
+		group.position.x = 9.5;
+		group.position.y = -1
+		const scale = 0.2;
+		group.scale.x = scale;
+		group.scale.y = scale;
+		group.scale.z = scale;
+		group.castShadow = true;
+		scene.add(group)
+	})
+
 
 
   // var sphereMaterial = getMaterial('standard', 'rgb(255, 255, 255)');
