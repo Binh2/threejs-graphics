@@ -66,88 +66,17 @@ function init() {
 		group.castShadow = true;
 		scene.add(group)
 	})
-
-
-
-  // var sphereMaterial = getMaterial('standard', 'rgb(255, 255, 255)');
-	// var sphere = getSphere(sphereMaterial, 1, 24);
-
-  // var planeMaterial = getMaterial('standard', 'rgb(255, 255, 255)', THREE.DoubleSide);
-  // var plane = getPlane(planeMaterial, 300);
-
-  // sphere.position.y = sphere.geometry.parameters.radius;
-  // plane.rotation.x = Math.PI/2;
-
-	var lightLeft = getSpotLight(1, 'rgb(255, 220, 180)');
-  var lightRight = getSpotLight(1, 'rgb(255, 220, 180)');
-  lightLeft.position.x = -5;
-  lightLeft.position.y = 2;
-  lightLeft.position.z = -4;
-  lightRight.position.x = 5;
-  lightRight.position.y = 2;
-  lightRight.position.z = -4;
-	scene.add(lightLeft);
-  scene.add(lightRight);
-
-  // // Load cube map
-  // var path = '/assets/cubemap/';
-  // var format = '.jpg';
-  // var urls = [
-  //   path + 'posx' + format, path + 'negx' + format,
-  //   path + 'posy' + format, path + 'negy' + format,
-  //   path + 'posz' + format, path + 'negz' + format,
-  // ]
-  // var reflectionCube = new THREE.CubeTextureLoader().load(urls);
-  // // reflectionCube.format = THREE.RGBFormat;
-
-  // Add textures
-  // var loader = new THREE.TextureLoader();
-  // var texture = loader.load('/assets/textures/concrete.jpg');
-  // planeMaterial.map = texture;
-  // planeMaterial.bumpMap = texture;
-  // planeMaterial.bumpScale = 0.1;
-  // planeMaterial.roughnessMap = texture;
-  // planeMaterial.metalness = 0.1;
-  // planeMaterial.roughness = 0.7;
-	// planeMaterial.envMap = reflectionCube;
-  // sphereMaterial.roughnessMap = loader.load('/assets/textures/fingerprint.jpg')
-  // sphereMaterial.envMap = reflectionCube;
-	// sphereMaterial.roughness = 0.1;
-	// sphereMaterial.metalness = 0.5;
-	// scene.background = reflectionCube;
-
-  // var maps = ['map', 'bumpMap', 'roughnessMap'];
-  // maps.forEach(mapName => {
-  //   texture = planeMaterial[mapName];
-  //   texture.wrapS = THREE.RepeatWrapping;
-  //   texture.wrapT = THREE.RepeatWrapping;
-  //   texture.repeat.set(15, 15);
-  // });
   
-
-	// scene.add(sphere);
-  // scene.add(plane);
-
-  // var folder1  = gui.addFolder('light_1');
-  // folder1.add(lightLeft, 'intensity', 0, 10);
-  // folder1.add(lightLeft.position, 'x', -5, 15);
-  // folder1.add(lightLeft.position, 'y', -5, 15);
-  // folder1.add(lightLeft.position, 'z', -5, 15);
-
-  // var folder2  = gui.addFolder('light_2');
-  // folder2.add(lightRight, 'intensity', 0, 10);
-  // folder2.add(lightRight.position, 'x', -5, 15);
-  // folder2.add(lightRight.position, 'y', -5, 15);
-  // folder2.add(lightRight.position, 'z', -5, 15);
-
-  // // console.log(sphereMaterial.shininess);
-  // // console.log(sphereMaterial);
-  // var folder3 = gui.addFolder('materials');
-  // folder3.add(sphereMaterial, 'roughness', 0, 1);
-  // folder3.add(planeMaterial, 'roughness', 0, 1);
-  // folder3.add(sphereMaterial, 'metalness', 0, 1);
-  // folder3.add(planeMaterial, 'metalness', 0, 1);
-  // // folder3.open();
+	var lightLeft = getSpotLight(1, 'rgb(255, 220, 180)');
+	var lightRight = getSpotLight(1, 'rgb(255, 220, 180)');
+	lightLeft.position.x = -5;
+	lightLeft.position.y = 2;
+	lightLeft.position.z = -4;
+	lightRight.position.x = 5;
+	lightRight.position.y = 2;
+	lightRight.position.z = -4;
+	scene.add(lightLeft);
+	scene.add(lightRight);
 
 	camera.position.x = 3;
 	camera.position.y = 6;
@@ -162,10 +91,42 @@ function init() {
 
 	var controls = new OrbitControls(camera, renderer.domElement);
 	
+	// Add controller for scene coordination
+	var controller = {
+		near: camera.near,
+		far: camera.far,
+		x: camera.position.x,
+		y: camera.position.y,
+		z: camera.position.z,
+	  };
+	
+	  var cameraFolder = gui.addFolder("Camera");
+	  cameraFolder.add(controller, "near", 1, 100).onChange(function (value) {
+		camera.near = value;
+		camera.updateProjectionMatrix();
+	  });
+	  cameraFolder.add(controller, "far", 100, 1000).onChange(function (value) {
+		camera.far = value;
+		camera.updateProjectionMatrix();
+	  });
+	  cameraFolder.add(controller, "x", -50, 50).onChange(function (value) {
+		camera.position.x = value;
+	  });
+	  cameraFolder.add(controller, "y", -50, 50).onChange(function (value) {
+		camera.position.y = value;
+	  });
+	  cameraFolder.add(controller, "z", -50, 50).onChange(function (value) {
+		camera.position.z = value;
+	  });
+	
+	update(renderer, scene, camera, controls, clock);
+	
+	// Add another update to make the transition smoother ~
 	update(renderer, scene, camera, controls, clock);
 	
 	return scene;
 }
+
 function update(renderer, scene, camera, controls, clock) {
 	renderer.render( scene, camera );
 	controls.update();
@@ -173,9 +134,6 @@ function update(renderer, scene, camera, controls, clock) {
 
 	var timeElapsed = clock.getElapsedTime();
 
-	// var cameraZRotation = scene.getObjectByName('cameraZRotation');
-	// cameraZRotation.rotation.z = noise.simplex2(timeElapsed * 1.5, timeElapsed * 1.5) * 0.02;
-	
 
 	requestAnimationFrame( () => update(renderer, scene, camera, controls, clock) );
 }
