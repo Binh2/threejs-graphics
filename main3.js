@@ -14,7 +14,7 @@ function init() {
 	var isFog = false;
 
 	const scene = new THREE.Scene();
-	const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+	const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
 	// const camera = new THREE.OrthographicCamera(-15, 15, 15, -15, 1, 1000);
 	const gui = new dat.GUI();
 	const clock = new THREE.Clock();
@@ -66,7 +66,7 @@ function init() {
 		group.castShadow = true;
 		scene.add(group)
 	})
-  
+
 	var lightLeft = getSpotLight(1, 'rgb(255, 220, 180)');
 	var lightRight = getSpotLight(1, 'rgb(255, 220, 180)');
 	lightLeft.position.x = -5;
@@ -85,12 +85,12 @@ function init() {
 
 	const renderer = new THREE.WebGLRenderer();
 	renderer.shadowMap.enabled = true;
-	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setClearColor('rgb(120, 120, 120)');
-	document.body.appendChild( renderer.domElement );
+	document.body.appendChild(renderer.domElement);
 
 	var controls = new OrbitControls(camera, renderer.domElement);
-	
+
 	// Add controller for scene coordination
 	var controller = {
 		near: camera.near,
@@ -98,51 +98,57 @@ function init() {
 		x: camera.position.x,
 		y: camera.position.y,
 		z: camera.position.z,
-	  };
-	
-	  var cameraFolder = gui.addFolder("Camera");
-	  cameraFolder.add(controller, "near", 1, 100).onChange(function (value) {
+	};
+
+	var cameraFolder = gui.addFolder("Perform Coordination");
+	cameraFolder.add(controller, "near", 1, 100).onChange(function (value) {
 		camera.near = value;
 		camera.updateProjectionMatrix();
-	  });
-	  cameraFolder.add(controller, "far", 100, 1000).onChange(function (value) {
+	});
+	cameraFolder.add(controller, "far", 100, 1000).onChange(function (value) {
 		camera.far = value;
 		camera.updateProjectionMatrix();
-	  });
-	  cameraFolder.add(controller, "x", -50, 50).onChange(function (value) {
+	});
+	cameraFolder.add(controller, "x", -50, 50).onChange(function (value) {
 		camera.position.x = value;
-	  });
-	  cameraFolder.add(controller, "y", -50, 50).onChange(function (value) {
+	});
+	cameraFolder.add(controller, "y", -50, 50).onChange(function (value) {
 		camera.position.y = value;
-	  });
-	  cameraFolder.add(controller, "z", -50, 50).onChange(function (value) {
+	});
+	cameraFolder.add(controller, "z", -50, 50).onChange(function (value) {
 		camera.position.z = value;
-	  });
-	
+	});
+
 	update(renderer, scene, camera, controls, clock);
-	
+
 	// Add another update to make the transition smoother ~
 	update(renderer, scene, camera, controls, clock);
-	
+
 	return scene;
 }
 
 function update(renderer, scene, camera, controls, clock) {
-	renderer.render( scene, camera );
+	renderer.render(scene, camera);
 	controls.update();
 	TWEEN.update();
-
+  
 	var timeElapsed = clock.getElapsedTime();
-
-
-	requestAnimationFrame( () => update(renderer, scene, camera, controls, clock) );
-}
+  
+	// Apply affine transformation to the scene
+	scene.rotation.x = Math.sin(timeElapsed) * Math.PI / 4;
+	scene.rotation.y = Math.cos(timeElapsed) * Math.PI / 4;
+	scene.scale.x = 1 + Math.sin(timeElapsed);
+	scene.scale.y = 1 + Math.cos(timeElapsed);
+	scene.position.y = Math.sin(timeElapsed) * 2;
+  
+	requestAnimationFrame(() => update(renderer, scene, camera, controls, clock));
+  }
 
 function getMaterial(type, color = 'rgb(255, 255, 255)', side = THREE.FrontSide) {
 	var materialOptions = {
-    color: color,
-    side: side,
-  };
+		color: color,
+		side: side,
+	};
 	switch (type) {
 		case 'basic':
 			return new THREE.MeshBasicMaterial(materialOptions);
@@ -153,7 +159,7 @@ function getMaterial(type, color = 'rgb(255, 255, 255)', side = THREE.FrontSide)
 		case 'standard':
 			return new THREE.MeshStandardMaterial(materialOptions);
 	}
-  return new THREE.MeshBasicMaterial(materialOptions);
+	return new THREE.MeshBasicMaterial(materialOptions);
 }
 function getPointLight(intensity) {
 	var light = new THREE.PointLight(0xffffff, intensity);
@@ -168,7 +174,7 @@ function getSpotLight(intensity, color) {
 	light.shadow.mapSize.width = 2048;
 	light.shadow.mapSize.height = 2048;
 
-  light.add(getSphere(0.1, 10, getMaterial('basic', color)));
+	light.add(getSphere(0.1, 10, getMaterial('basic', color)));
 
 	return light;
 }
@@ -184,7 +190,7 @@ function getDirectionalLight(intensity, color) {
 	light.shadow.mapSize.width = 2048;
 	light.shadow.mapSize.height = 2048;
 
-  light.add(getSphere(getMaterial('basic', color), 0.1));
+	light.add(getSphere(getMaterial('basic', color), 0.1));
 
 	return light;
 }
@@ -194,32 +200,32 @@ function getAmbientLight(intensity) {
 	return light;
 }
 function getBox(w, h, d) {
-	const geometry = new THREE.BoxGeometry( w, h, d );
-	const material = new THREE.MeshPhongMaterial( { 
+	const geometry = new THREE.BoxGeometry(w, h, d);
+	const material = new THREE.MeshPhongMaterial({
 		color: 'rgb(120, 120, 120)',
-	} );
-	const mesh = new THREE.Mesh( geometry, material );
+	});
+	const mesh = new THREE.Mesh(geometry, material);
 	mesh.castShadow = true;
 	return mesh
 }
 function getPlane(material, size) {
 	const geometry = new THREE.PlaneGeometry(size, size);
-	const mesh = new THREE.Mesh( geometry, material );
+	const mesh = new THREE.Mesh(geometry, material);
 	mesh.receiveShadow = true;
 	return mesh
 }
 function getSphere(size, segments = 24, material = getMaterial('standard', 'rgb(255, 255, 255)')) {
-	const geometry = new THREE.SphereGeometry( size, segments, segments );
-	const mesh = new THREE.Mesh( geometry, material );
-  mesh.castShadow = true;
-	
+	const geometry = new THREE.SphereGeometry(size, segments, segments);
+	const mesh = new THREE.Mesh(geometry, material);
+	mesh.castShadow = true;
+
 	return mesh
 }
 function getCone(r, h, material = getMaterial('standard')) {
 	const geometry = new THREE.ConeGeometry(r, h, 32);
-	const mesh = new THREE.Mesh( geometry, material );
+	const mesh = new THREE.Mesh(geometry, material);
 	mesh.castShadow = true;
-	
+
 	return mesh
 }
 function getCylinder(r, h, material = getMaterial('standard')) {
