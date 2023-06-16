@@ -10,6 +10,9 @@ import { Mesh } from 'three';
 
 var noise = new Noise.Noise(Math.random());
 
+var transformationType = 'Translation';
+var transformationValue = 0;
+
 function init() {
 	var isFog = false;
 
@@ -119,30 +122,67 @@ function init() {
 		camera.position.z = value;
 	});
 
+	// Add controller for selecting transformation type
+	var transformationController = gui.add({ Transformation: transformationType }, 'Transformation', ['Translation', 'Scale', 'Shear', 'Rotation']);
+	transformationController.onChange(function (value) {
+		transformationType = value;
+	});
+
+	// Add controller for transformation value
+	var transformationValueController = gui.add({ Value: transformationValue }, 'Value', -1, 1, 0.1);
+	transformationValueController.onChange(function (value) {
+		transformationValue = value;
+	});
+
+	// Add event listener for keyboard events
+	document.addEventListener('keydown', handleKeyPress);
+
 	update(renderer, scene, camera, controls, clock);
 
-	// Add another update to make the transition smoother ~
+	// Add another update to make the coordination transformation smoother
 	update(renderer, scene, camera, controls, clock);
 
 	return scene;
+}
+
+function handleKeyPress(event) {
+	switch (event.key) {
+		case 'ArrowUp':
+			applyTransformation(transformationType, transformationValue); // Apply selected transformation
+			break;
+	}
+}
+
+function applyTransformation(type, value) {
+	switch (type) {
+		case 'Translation':
+			scene.position.y += value; // Translate in the Y direction
+			break;
+		case 'Scale':
+			scene.scale.x += value; // Scale in the X direction
+			scene.scale.y += value; // Scale in the Y direction
+			scene.scale.z += value; // Scale in the Z direction
+			break;
+		case 'Shear':
+			scene.rotation.x += value; // Shear in the X direction
+			scene.rotation.y += value; // Shear in the Y direction
+			break;
+		case 'Rotation':
+			scene.rotation.z += value; // Rotate around the Z axis
+			break;
+	}
 }
 
 function update(renderer, scene, camera, controls, clock) {
 	renderer.render(scene, camera);
 	controls.update();
 	TWEEN.update();
-  
+
+
 	var timeElapsed = clock.getElapsedTime();
-  
-	// Apply affine transformation to the scene
-	scene.rotation.x = Math.sin(timeElapsed) * Math.PI / 4;
-	scene.rotation.y = Math.cos(timeElapsed) * Math.PI / 4;
-	scene.scale.x = 1 + Math.sin(timeElapsed);
-	scene.scale.y = 1 + Math.cos(timeElapsed);
-	scene.position.y = Math.sin(timeElapsed) * 2;
-  
+
 	requestAnimationFrame(() => update(renderer, scene, camera, controls, clock));
-  }
+}
 
 function getMaterial(type, color = 'rgb(255, 255, 255)', side = THREE.FrontSide) {
 	var materialOptions = {
