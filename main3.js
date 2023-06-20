@@ -12,6 +12,8 @@ var noise = new Noise.Noise(Math.random());
 
 var transformationType = 'Translation';
 var transformationValue = 0;
+var loader = new THREE.TextureLoader();
+const gui = new dat.GUI();
 
 function init() {
 	var isFog = false;
@@ -19,17 +21,21 @@ function init() {
 	const scene = new THREE.Scene();
 	const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
 	// const camera = new THREE.OrthographicCamera(-15, 15, 15, -15, 1, 1000);
-	const gui = new dat.GUI();
+
 	const clock = new THREE.Clock();
 	if (isFog) {
 		scene.fog = new THREE.FogExp2(0xffffff, 0.01);
 	}
+
+	const concrete = loader.load("./assets/textures/concrete.jpg");
+	scene.background = concrete;
 
 	var box = getBox(1, 3, 1);
 	var sphere = getSphere(1);
 	var cone = getCone(1, 2);
 	var cylinder = getCylinder(1, 2);
 	var donut = getDonut(1, 0.5);
+
 	box.position.x = -10;
 	sphere.position.x = -7.5;
 	cone.position.x = -5;
@@ -184,6 +190,24 @@ function update(renderer, scene, camera, controls, clock) {
 	requestAnimationFrame(() => update(renderer, scene, camera, controls, clock));
 }
 
+// Add texture
+var textureValue = "Texture";
+var textureController = gui.add({ Texture: textureValue }, 'Texture', ["checkerboard", "fingerprint"]);
+textureController.onChange((value) => {
+	const texture = loader.load(`./assets/textures/${value}.jpg`);
+
+	applyTextureToObjects(texture);
+})
+
+function applyTextureToObjects(texture) {
+	scene.traverse((object) => {
+		if (object instanceof THREE.Mesh) {
+			object.material.map = texture;
+			object.material.needsUpdate = true;
+		}
+	});
+}
+
 function getMaterial(type, color = 'rgb(255, 255, 255)', side = THREE.FrontSide) {
 	var materialOptions = {
 		color: color,
@@ -201,11 +225,13 @@ function getMaterial(type, color = 'rgb(255, 255, 255)', side = THREE.FrontSide)
 	}
 	return new THREE.MeshBasicMaterial(materialOptions);
 }
+
 function getPointLight(intensity) {
 	var light = new THREE.PointLight(0xffffff, intensity);
 	light.castShadow = true;
 	return light;
 }
+
 function getSpotLight(intensity, color) {
 	var light = new THREE.SpotLight(color, intensity);
 	light.castShadow = true;
@@ -218,6 +244,7 @@ function getSpotLight(intensity, color) {
 
 	return light;
 }
+
 function getDirectionalLight(intensity, color) {
 	var light = new THREE.DirectionalLight(color, intensity);
 	light.castShadow = true;
@@ -234,54 +261,59 @@ function getDirectionalLight(intensity, color) {
 
 	return light;
 }
+
 function getAmbientLight(intensity) {
 	var light = new THREE.AmbientLight('rgb(10, 30, 50)', intensity);
 	// light.castShadow = true;
 	return light;
 }
+
 function getBox(w, h, d) {
 	const geometry = new THREE.BoxGeometry(w, h, d);
 	const material = new THREE.MeshPhongMaterial({
 		color: 'rgb(120, 120, 120)',
 	});
-	const mesh = new THREE.Mesh(geometry, material);
+	const mesh = new THREE.Mesh(geometry);
 	mesh.castShadow = true;
-	return mesh
+	return mesh;
 }
+
 function getPlane(material, size) {
 	const geometry = new THREE.PlaneGeometry(size, size);
-	const mesh = new THREE.Mesh(geometry, material);
+	const mesh = new THREE.Mesh(geometry);
 	mesh.receiveShadow = true;
-	return mesh
+	return mesh;
 }
+
 function getSphere(size, segments = 24, material = getMaterial('standard', 'rgb(255, 255, 255)')) {
 	const geometry = new THREE.SphereGeometry(size, segments, segments);
-	const mesh = new THREE.Mesh(geometry, material);
+	const mesh = new THREE.Mesh(geometry);
 	mesh.castShadow = true;
 
-	return mesh
+	return mesh;
 }
+
 function getCone(r, h, material = getMaterial('standard')) {
 	const geometry = new THREE.ConeGeometry(r, h, 32);
-	const mesh = new THREE.Mesh(geometry, material);
+	const mesh = new THREE.Mesh(geometry);
 	mesh.castShadow = true;
 
-	return mesh
+	return mesh;
 }
 function getCylinder(r, h, material = getMaterial('standard')) {
 	const geometry = new THREE.CylinderGeometry(r, r, h);
-	const mesh = new THREE.Mesh(geometry, material);
+	const mesh = new THREE.Mesh(geometry);
 	mesh.castShadow = true;
 
 	return mesh;
 }
 function getDonut(r1, r2, material = getMaterial('standard')) {
 	const geometry = new THREE.TorusGeometry(r1, r2);
-	const mesh = new THREE.Mesh(geometry, material);
+	const mesh = new THREE.Mesh(geometry);
 	mesh.castShadow = true;
 
 	return mesh;
 }
 
-var scene = init(); // Can't access for some reason
-window.scene = scene; // Can access with window.scene in the browser's console
+var scene = init();
+window.scene = scene;
