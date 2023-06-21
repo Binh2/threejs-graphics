@@ -7,9 +7,14 @@ import { drawBasicShape } from './1_basic_shapes';
 import { addLight } from './5_lighting';
 import { getMaterial } from './lib';
 import { userDraw } from './2_user_draw';
+import { textureMapping } from './6_texture';
 import { scene, camera, gui, clock, renderer, controls } from './global';
+import { perspectiveProjection } from './3_perspective_projection';
 
 var noise = new Noise.Noise(Math.random());
+
+var transformationType = 'Translation';
+var transformationValue = 0;
 
 function init() {
 	// const camera = new THREE.OrthographicCamera(-15, 15, 15, -15, 1, 1000);
@@ -20,79 +25,69 @@ function init() {
 
 	let {box,sphere,cone,cylinder,donut} = drawBasicShape(); // 1
 	userDraw(); // 2
+  perspectiveProjection();
 	addLight(); // 5
+  textureMapping(); // 6
 	
-
-  // // Load cube map
-  // var path = '/assets/cubemap/';
-  // var format = '.jpg';
-  // var urls = [
-  //   path + 'posx' + format, path + 'negx' + format,
-  //   path + 'posy' + format, path + 'negy' + format,
-  //   path + 'posz' + format, path + 'negz' + format,
-  // ]
-  // var reflectionCube = new THREE.CubeTextureLoader().load(urls);
-  // // reflectionCube.format = THREE.RGBFormat;
-
-  // Add textures
-  // var loader = new THREE.TextureLoader();
-  // var texture = loader.load('/assets/textures/concrete.jpg');
-  // planeMaterial.map = texture;
-  // planeMaterial.bumpMap = texture;
-  // planeMaterial.bumpScale = 0.1;
-  // planeMaterial.roughnessMap = texture;
-  // planeMaterial.metalness = 0.1;
-  // planeMaterial.roughness = 0.7;
-	// planeMaterial.envMap = reflectionCube;
-  // sphereMaterial.roughnessMap = loader.load('/assets/textures/fingerprint.jpg')
-  // sphereMaterial.envMap = reflectionCube;
-	// sphereMaterial.roughness = 0.1;
-	// sphereMaterial.metalness = 0.5;
-	// scene.background = reflectionCube;
-
-  // var maps = ['map', 'bumpMap', 'roughnessMap'];
-  // maps.forEach(mapName => {
-  //   texture = planeMaterial[mapName];
-  //   texture.wrapS = THREE.RepeatWrapping;
-  //   texture.wrapT = THREE.RepeatWrapping;
-  //   texture.repeat.set(15, 15);
-  // });
-  
-
-	// scene.add(sphere);
-  // scene.add(plane);
-
-	
-	
-  // var folder2  = gui.addFolder('light_2');
-  // folder2.add(lightRight, 'intensity', 0, 10);
-  // folder2.add(lightRight.position, 'x', -5, 15);
-  // folder2.add(lightRight.position, 'y', -5, 15);
-  // folder2.add(lightRight.position, 'z', -5, 15);
-
-  console.log(camera)
 	camera.position.x = 3;
 	camera.position.y = 6;
 	camera.position.z = 15;
 	camera.lookAt(new THREE.Vector3(0, 0, 0));
-	
+
+	// Add controller for selecting transformation type
+	var transformationController = gui.add({ Transformation: transformationType }, 'Transformation', ['Translation', 'Scale', 'Shear', 'Rotation']);
+	transformationController.onChange(function (value) {
+		transformationType = value;
+	});
+
+	// Add controller for transformation value
+	var transformationValueController = gui.add({ Value: transformationValue }, 'Value', -1, 1, 0.1);
+	transformationValueController.onChange(function (value) {
+		transformationValue = value;
+	});
+
+	// Add event listener for keyboard events
+	document.addEventListener('keydown', handleKeyPress);
 	update(renderer, scene, camera, controls, clock);
-	
 	return scene;
 }
-// window.addEventListener("click", stopDraw);
+
+function handleKeyPress(event) {
+	switch (event.key) {
+		case 'ArrowUp':
+			applyTransformation(transformationType, transformationValue); // Apply selected transformation
+			break;
+	}
+}
+
+function applyTransformation(type, value) {
+	switch (type) {
+		case 'Translation':
+			scene.position.y += value; // Translate in the Y direction
+			break;
+		case 'Scale':
+			scene.scale.x += value; // Scale in the X direction
+			scene.scale.y += value; // Scale in the Y direction
+			scene.scale.z += value; // Scale in the Z direction
+			break;
+		case 'Shear':
+			scene.rotation.x += value; // Shear in the X direction
+			scene.rotation.y += value; // Shear in the Y direction
+			break;
+		case 'Rotation':
+			scene.rotation.z += value; // Rotate around the Z axis
+			break;
+	}
+}
+
 function update(renderer, scene, camera, controls, clock) {
-	renderer.render( scene, camera );
-	controls.update();	
+	renderer.render(scene, camera);
+	controls.update();
 	TWEEN.update();
 
 	var timeElapsed = clock.getElapsedTime();
 
-	// var cameraZRotation = scene.getObjectByName('cameraZRotation');
-	// cameraZRotation.rotation.z = noise.simplex2(timeElapsed * 1.5, timeElapsed * 1.5) * 0.02;
-	
-
-	requestAnimationFrame( () => update(renderer, scene, camera, controls, clock) );
+	requestAnimationFrame(() => update(renderer, scene, camera, controls, clock));
 }
 
 
