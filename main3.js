@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-import * as dat from 'dat.gui';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as TWEEN from '@tweenjs/tween.js';
 import Noise from 'noisejs';
 import { MeshPhongMaterial } from 'three';
@@ -8,19 +6,22 @@ import { Mesh } from 'three';
 import { drawBasicShape } from './1_basic_shapes';
 import { addLight } from './5_lighting';
 import { getMaterial } from './lib';
+import { userDraw } from './2_user_draw';
+import { scene, camera, gui, clock, renderer, controls } from './global';
 
 var noise = new Noise.Noise(Math.random());
 
 function init() {
-	const scene = new THREE.Scene();
-	const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 	// const camera = new THREE.OrthographicCamera(-15, 15, 15, -15, 1, 1000);
-	const gui = new dat.GUI();
-	const clock = new THREE.Clock();
+	renderer.shadowMap.enabled = true;
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setClearColor('rgb(120, 120, 120)');
+	document.body.appendChild( renderer.domElement );
 
+	let {box,sphere,cone,cylinder,donut} = drawBasicShape(); // 1
+	userDraw(); // 2
+	addLight(); // 5
 	
-	addLight(scene);
-	drawBasicShape(scene);
 
   // // Load cube map
   // var path = '/assets/cubemap/';
@@ -61,37 +62,19 @@ function init() {
 	// scene.add(sphere);
   // scene.add(plane);
 
-	let menu = {
-		select: true,
-		point: false,
-		line: false,
-		solid: false,
-	}
-	let folder1 = gui.addFolder('Draw');
-	folder1.add(menu, "select").name("select").listen().onChange(() => menuChanged(menu, "select"));
-	folder1.add(menu, "point").name("point").listen().onChange(() => menuChanged(menu, "point"));
-	folder1.add(menu, "line").name("line").listen().onChange(() => menuChanged(menu, "line"));
-	folder1.add(menu, "solid").name("solid").listen().onChange(() => menuChanged(menu, "solid"));
-	folder1.open()
+	
+	
   // var folder2  = gui.addFolder('light_2');
   // folder2.add(lightRight, 'intensity', 0, 10);
   // folder2.add(lightRight.position, 'x', -5, 15);
   // folder2.add(lightRight.position, 'y', -5, 15);
   // folder2.add(lightRight.position, 'z', -5, 15);
 
+  console.log(camera)
 	camera.position.x = 3;
 	camera.position.y = 6;
 	camera.position.z = 15;
 	camera.lookAt(new THREE.Vector3(0, 0, 0));
-
-	const renderer = new THREE.WebGLRenderer();
-	renderer.shadowMap.enabled = true;
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setClearColor('rgb(120, 120, 120)');
-	document.body.appendChild( renderer.domElement );
-
-	// var controls = new OrbitControls(camera, renderer.domElement);
-	let controls = null;
 	
 	update(renderer, scene, camera, controls, clock);
 	
@@ -100,7 +83,7 @@ function init() {
 // window.addEventListener("click", stopDraw);
 function update(renderer, scene, camera, controls, clock) {
 	renderer.render( scene, camera );
-	// controls.update();	
+	controls.update();	
 	TWEEN.update();
 
 	var timeElapsed = clock.getElapsedTime();
@@ -112,12 +95,7 @@ function update(renderer, scene, camera, controls, clock) {
 	requestAnimationFrame( () => update(renderer, scene, camera, controls, clock) );
 }
 
-function menuChanged(menu, item) {
-	for (let i in menu) {
-		menu[i] = false;
-	}
-	menu[item] = true;
-}
 
-var scene = init(); // Can't access for some reason
+
+init(); // Can't access for some reason
 window.scene = scene; // Can access with window.scene in the browser's console

@@ -1,8 +1,9 @@
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import * as THREE from "three"
 import { getMaterial, getSphere } from './lib';
+import { scene } from './global'
 
-export function drawBasicShape(scene) {
+export function drawBasicShape() {
   var box = getBox(1, 3, 1);
 	var sphere = getSphere(1);
 	var cone = getCone(1, 2);
@@ -20,8 +21,16 @@ export function drawBasicShape(scene) {
 	scene.add(donut)
 
   // loadFBX(scene, "assets/objects/original-wheel.fbx", new THREE.Vector3(-0.5, 0, 0), 2);
+	loadFBX(scene, "assets/objects/truck_wheels_front_v2.fbx", new THREE.Vector3(-0.5, 0, 0), 2);
   loadFBX(scene, "assets/objects/teapot_s0.fbx", new THREE.Vector3(1, -0.5, 0), 0.1);
   loadFBX(scene, "assets/objects/Ginger_Bread_Cookies_FBX.fbx", new THREE.Vector3(9.5, -1, 0), 0.2);
+  return {
+    box,
+    sphere,
+    cone,
+    cylinder,
+    donut,
+  }
 }
 
 function getBox(w, h, d) {
@@ -63,6 +72,9 @@ function loadFBX(scene, filename, position, scale) {
 		group.position.x = position.x;
     group.position.y = position.y;
     group.position.z = position.z;
+		// console.log(group)
+		group.castShadow = true
+		group.traverse(obj => obj.castShadow = true)
 		scene.add(group);
 	})
   return null;

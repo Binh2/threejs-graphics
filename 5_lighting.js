@@ -1,18 +1,20 @@
 import { getMaterial, getSphere } from "./lib";
 import * as THREE from 'three';
+import { scene } from './global'
 
-export function addLight(scene) {
+export function addLight() {
   var spotLight = getSpotLight(1, 'rgb(255, 220, 180)');
   let pointLight = getPointLight(0.5)
   let ambientLight = getAmbientLight(0.1);
   let directionalLight = getDirectionalLight(0.3);
-  let plane = getPlane(getMaterial('standard', 'white', THREE.DoubleSide), 20);
+  let plane = getPlane(getMaterial('standard', 'white', THREE.DoubleSide), 50);
   spotLight.position.x = -5;
   spotLight.position.y = 2;
   spotLight.position.z = -4;
   pointLight.position.x = 5;
   pointLight.position.y = 2;
   pointLight.position.z = -4;
+	directionalLight.position.y = 5;
   plane.position.y = -2;
   plane.rotateX(Math.PI / 2)
 	scene.add(spotLight);
@@ -50,7 +52,7 @@ function getDirectionalLight(intensity, color) {
 	light.shadow.mapSize.width = 2048;
 	light.shadow.mapSize.height = 2048;
 
-  light.add(0.1, 10, getSphere(getMaterial('basic', color)));
+  light.add(getSphere(0.1, 10, getMaterial('basic', color)));
 
 	return light;
 }
