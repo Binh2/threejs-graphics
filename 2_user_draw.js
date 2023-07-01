@@ -14,12 +14,12 @@ export function userDraw() {
 		line: false,
 		solid: false,
 	}
-  let folder1 = gui.addFolder('Draw');
-	folder1.add(menu, "select").name("select").listen().onChange(() => menuChanged(scene, menu, camera, "select", controls));
-	folder1.add(menu, "point").name("point").listen().onChange(() => menuChanged(scene, menu, camera, "point", controls));
-	folder1.add(menu, "line").name("line").listen().onChange(() => menuChanged(scene, menu, camera, "line", controls));
-	folder1.add(menu, "solid").name("solid").listen().onChange(() => menuChanged(scene, menu, camera, "solid", controls));
-	folder1.open()
+  let folder1 = gui.addFolder('User draw');
+	folder1.add(menu, "select").name("select").listen().onChange(() => menuChanged("select"));
+	folder1.add(menu, "point").name("point").listen().onChange(() => menuChanged("point"));
+	folder1.add(menu, "line").name("line").listen().onChange(() => menuChanged("line"));
+	folder1.add(menu, "solid").name("solid").listen().onChange(() => menuChanged("solid"));
+	// folder1.open()
   // let folder2 = gui.addFolder('Offset');
   // folder2.add(offset, 'x', -1, 1)
   // folder2.add(offset, 'y', -1, 1)
@@ -27,7 +27,7 @@ export function userDraw() {
   // folder2.open();
 }
 
-function menuChanged(scene, menu, camera, item, controls) {
+function menuChanged(item) {
 	for (let i in menu) {
 		menu[i] = false;
 	}

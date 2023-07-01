@@ -1,11 +1,7 @@
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
-import Noise from 'noisejs';
-import { MeshPhongMaterial } from 'three';
-import { Mesh } from 'three';
 import { drawBasicShape } from './1_basic_shapes';
 import { addLight } from './5_lighting';
-import { getMaterial } from './lib';
 import { userDraw } from './2_user_draw';
 import { textureMapping } from './6_texture';
 import { scene, camera, gui, clock, renderer, controls } from './global';

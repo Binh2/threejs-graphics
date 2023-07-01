@@ -1,7 +1,7 @@
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import * as THREE from "three"
 import { getMaterial, getSphere } from './lib';
-import { scene } from './global'
+import { scene, gui } from './global'
 
 export function drawBasicShape() {
   var box = getBox(1, 3, 1);
