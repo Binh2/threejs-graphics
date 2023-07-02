@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "dev": "npx vite"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@tweenjs/tween.js": "^18.6.4",

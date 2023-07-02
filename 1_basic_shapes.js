@@ -20,9 +20,9 @@ export function drawBasicShape() {
 	scene.add(cylinder)
 	scene.add(donut)
 
-	loadFBX(scene, "assets/objects/truck_wheels_front_v2.fbx", new THREE.Vector3(3, 0, 0), 2, 'wheel');
-  loadFBX(scene, "assets/objects/teapot_s0.fbx", new THREE.Vector3(4.5, -0.5, 0), 0.1, 'teapot');
-  loadFBX(scene, "assets/objects/Ginger_Bread_Cookies_FBX.fbx", new THREE.Vector3(9.5, -1, 0), 0.2, 'gingerBread');
+	loadFBX(scene, "/objects/truck_wheels_front_v2.fbx", new THREE.Vector3(3, 0, 0), 2, 'wheel');
+  loadFBX(scene, "/objects/teapot_s0.fbx", new THREE.Vector3(4.5, -0.5, 0), 0.1, 'teapot');
+  loadFBX(scene, "/objects/Ginger_Bread_Cookies_FBX.fbx", new THREE.Vector3(9.5, -1, 0), 0.2, 'gingerBread');
   return {
     box,
     sphere,

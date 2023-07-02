@@ -6,7 +6,7 @@ export function textureMapping() {
   var textureValue = "Texture";
   var textureController = gui.add({ Texture: textureValue }, 'Texture', ["checkerboard", "fingerprint"]);
   textureController.onChange((value) => {
-    const texture = loader.load(`./assets/textures/${value}.jpg`);
+    const texture = loader.load(`/textures/${value}.jpg`);
 
     applyTextureToObjects(texture);
   })
