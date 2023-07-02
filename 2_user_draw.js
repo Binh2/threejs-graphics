@@ -7,24 +7,18 @@ let offset = {
   y: 0,
   z: 0
 };
+let menu = {
+  select: true,
+  point: false,
+  line: false,
+  solid: false,
+}
 export function userDraw() {
-  let menu = {
-		select: true,
-		point: false,
-		line: false,
-		solid: false,
-	}
   let folder1 = gui.addFolder('User draw');
 	folder1.add(menu, "select").name("select").listen().onChange(() => menuChanged("select"));
 	folder1.add(menu, "point").name("point").listen().onChange(() => menuChanged("point"));
 	folder1.add(menu, "line").name("line").listen().onChange(() => menuChanged("line"));
 	folder1.add(menu, "solid").name("solid").listen().onChange(() => menuChanged("solid"));
-	// folder1.open()
-  // let folder2 = gui.addFolder('Offset');
-  // folder2.add(offset, 'x', -1, 1)
-  // folder2.add(offset, 'y', -1, 1)
-  // folder2.add(offset, 'z', -1, 1)
-  // folder2.open();
 }
 
 function menuChanged(item) {

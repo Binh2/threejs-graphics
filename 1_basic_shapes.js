@@ -13,17 +13,16 @@ export function drawBasicShape() {
 	sphere.position.x = -7.5;
 	cone.position.x = -5;
 	cylinder.position.x = -2.5;
-	donut.position.x = 4.5;
+	donut.position.x = 0.5;
 	scene.add(box)
 	scene.add(sphere)
 	scene.add(cone)
 	scene.add(cylinder)
 	scene.add(donut)
 
-  // loadFBX(scene, "assets/objects/original-wheel.fbx", new THREE.Vector3(-0.5, 0, 0), 2);
-	loadFBX(scene, "assets/objects/truck_wheels_front_v2.fbx", new THREE.Vector3(-0.5, 0, 0), 2);
-  loadFBX(scene, "assets/objects/teapot_s0.fbx", new THREE.Vector3(1, -0.5, 0), 0.1);
-  loadFBX(scene, "assets/objects/Ginger_Bread_Cookies_FBX.fbx", new THREE.Vector3(9.5, -1, 0), 0.2);
+	loadFBX(scene, "assets/objects/truck_wheels_front_v2.fbx", new THREE.Vector3(3, 0, 0), 2, 'wheel');
+  loadFBX(scene, "assets/objects/teapot_s0.fbx", new THREE.Vector3(4.5, -0.5, 0), 0.1, 'teapot');
+  loadFBX(scene, "assets/objects/Ginger_Bread_Cookies_FBX.fbx", new THREE.Vector3(9.5, -1, 0), 0.2, 'gingerBread');
   return {
     box,
     sphere,
@@ -64,7 +63,7 @@ function getDonut(r1, r2, material = getMaterial('standard')) {
 	return mesh;
 }
 
-function loadFBX(scene, filename, position, scale) {
+function loadFBX(scene, filename, position, scale, name = '') {
   new FBXLoader().load(filename, group => {
 		group.scale.x = scale;
 		group.scale.y = scale;
@@ -75,7 +74,11 @@ function loadFBX(scene, filename, position, scale) {
 		// console.log(group)
 		group.castShadow = true
 		group.traverse(obj => obj.castShadow = true)
+		group.name = name
 		scene.add(group);
+		window.dispatchEvent(new CustomEvent("objectLoaded", { detail: {
+			name,
+			object: group,
+	 }}))
 	})
-  return null;
 }

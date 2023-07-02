@@ -2,9 +2,12 @@ import { renderer, scene, gui, controls, camera } from "./global";
 import * as THREE from 'three'
 
 const menu = { normal: true, translate: false, rotate: false, scale: false, skew: false }
-const objects = { box: null, sphere: null, cone: null, cylinder: null, donut: null }
+let objects = {}
 export function transformation(box, sphere, cone, cylinder, donut) {
-	objects.box = box; objects.sphere = sphere; objects.cone = cone; objects.cylinder = cylinder; objects.donut = donut;
+	objects = {box, sphere, cone, cylinder, donut}
+	window.addEventListener("objectLoaded", (e) => {
+		objects[e.detail.name] = e.detail.object
+	})
 	let folder = gui.addFolder("Affine transformation");
 	folder.add(menu, 'normal').name("Normal").listen().onChange(() => menuChanged("normal"))
 	folder.add(menu, 'translate').name("Translate").listen().onChange(() => menuChanged("translate"))
@@ -75,7 +78,6 @@ function mouseUp(event) {
   isPressedDown = false;
 }
 function translate(dx, dy) {
-	console.log('hello')
 	for (let objectName in objects) {
 		const object = objects[objectName];
 		object.position.x += dx;
@@ -98,7 +100,6 @@ function scale(dx, dy) {
 }
 let prevMatrix;
 function skew(dx, dy) {
-	console.log(objects.box)
 	const scale = 1
 	const matrix = new THREE.Matrix4();
 	matrix.makeShear(-dy * scale, 0, dx * scale,0,0,0)
